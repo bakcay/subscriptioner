@@ -12,7 +12,7 @@ class SubscriptionObserver
      */
     public function created(Subscription $subscription): void
     {
-        $ipAddress = app('requestIp');
+        $ipAddress = app()->bound('requestIp')?app('requestIp'):null;
         Event::create([
             'user_id'    => $subscription->user_id,
             'event'      => 'started' ,
@@ -26,7 +26,8 @@ class SubscriptionObserver
      */
     public function updated(Subscription $subscription): void
     {
-        $ipAddress   = app('requestIp');
+         $ipAddress = app()->bound('requestIp')?app('requestIp'):null;
+
         $_event_data = [
             'user_id' => $subscription->user_id,
             'event'   => '',
