@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -41,7 +41,7 @@ class Subscription extends Model
         'status',
         'start_date',
         'end_date',
-        'last_check',
+        'user_count',
     ];
 
     public function user()
