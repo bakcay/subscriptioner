@@ -30,7 +30,7 @@ class RescaleService implements ShouldQueue
      */
     public function handle(): void
     {
-        $user = User::find($this->user_id);
+        $user = User::with('subscription')->find($this->user_id);
 
         $service = ZotloService::updateUserCount($user->subscriber_id, $this->count);
 
@@ -38,7 +38,7 @@ class RescaleService implements ShouldQueue
             throw new SubscriptionException($service['meta']['errorMessage'], 400);
         }
 
-        $user->activeSubscription->status = 'inactive';
-        $user->activeSubscription->save();
+        $user->subscription->user_count = $this->count;
+        $user->subscription->save();
     }
 }

@@ -15,14 +15,14 @@ class SyncService implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $user_id;
+
 
     /**
      * Create a new job instance.
      */
-    public function __construct($user_id)
+    public function __construct()
     {
-        $this->user_id = $user_id;
+
     }
 
     /**
@@ -34,10 +34,16 @@ class SyncService implements ShouldQueue
             'subscription' => function ($query) {
                 $query->where('last_check', '<', now()->subMinutes(2));
             }
-        ])->get();
+        ])->withCount('subscription')
+            ->limit(10)
+            ->get();
 
         foreach ($users as $index => $user) {
             /** @var User $user */
+
+            if($user->subscription_count == 0){
+                continue;
+            }
 
             $response_old = \Cache::get('subscription_detail_' . $user->subscriber_id);
 
@@ -50,31 +56,29 @@ class SyncService implements ShouldQueue
                 throw new SubscriptionException($response['meta']['errorMessage'], 400);
             }
 
-            if($response_old['result']['profile']['realStatus'] == $response['result']['profile']['realStatus']){
 
+
+
+            if ($response['result']['profile']['realStatus'] == 'active' && $user->subscription->status != 'active') {
+                $user->subscription->status     = 'active';
+                $user->subscription->start_date = $response['result']['profile']['startDate'];
+                $user->subscription->end_date   = $response['result']['profile']['expireDate'];
+                $user->subscription->save();
             }
 
-
-            if ($response['result']['profile']['realStatus'] == 'active' && $user->activeSubscription->status != 'active') {
-                $user->activeSubscription->status     = 'active';
-                $user->activeSubscription->start_date = $response['result']['profile']['startDate'];
-                $user->activeSubscription->end_date   = $response['result']['profile']['expireDate'];
-                $user->activeSubscription->save();
+            if ($response['result']['profile']['realStatus'] == 'active' && $response['result']['profile']['expireDate'] != $user->subscription->end_date){
+                $user->subscription->end_date   = $response['result']['profile']['expireDate'];
+                $user->subscription->save();
             }
 
-            if ($response['result']['profile']['realStatus'] == 'active' && $response['result']['profile']['expireDate'] != $user->activeSubscription->end_date){
-                $user->activeSubscription->end_date   = $response['result']['profile']['expireDate'];
-                $user->activeSubscription->save();
+            if ($response['result']['profile']['realStatus'] != 'active' && $user->subscription->status == 'active') {
+                $user->subscription->status = 'inactive';
+                $user->subscription->save();
             }
 
-            if ($response['result']['profile']['realStatus'] != 'active' && $user->activeSubscription->status == 'active') {
-                $user->activeSubscription->status = 'inactive';
-                $user->activeSubscription->save();
-            }
-
-            if ($response['result']['profile']['quantity'] != $user->activeSubscription->user_count) {
-                $user->activeSubscription->user_count = $response['result']['profile']['quantity'];
-                $user->activeSubscription->save();
+            if ($response['result']['profile']['quantity'] != $user->subscription->user_count) {
+                $user->subscription->user_count = $response['result']['profile']['quantity'];
+                $user->subscription->save();
             }
         }
     }

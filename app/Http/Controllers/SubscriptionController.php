@@ -161,8 +161,12 @@ class SubscriptionController extends Controller
                             ->with(['subscription'])
                             ->find($user_id);
 
-        if ($current_user->subscription_count == 1) {
-            throw new SubscriptionException('There is no passive subscription', 400);
+        if ($current_user->subscription_count != 1 ) {
+            throw new SubscriptionException('There is no subscription', 400);
+        }
+
+        if($current_user->subscription->status == 'active'){
+            throw new SubscriptionException('Subscription is already active', 400);
         }
 
 
@@ -207,7 +211,15 @@ class SubscriptionController extends Controller
             throw new SubscriptionException('There is no active subscription', 400);
         }
 
-        $count = $request->input('count');
+        if($current_user->subscription->status != 'active'){
+            throw new SubscriptionException('Subscription is not active', 400);
+        }
+
+        $count = $request->input('count',0);
+
+        if ($count<1) {
+            throw new SubscriptionException('Count cannot be lower than 1', 400);
+        }
 
         RescaleService::dispatch($user_id, $count);
 
@@ -239,7 +251,6 @@ class SubscriptionController extends Controller
             'cards' => $response['result']['cardList']
         ]);
     }
-
 
     protected function preparePaymentData($current_user, $request)
     {

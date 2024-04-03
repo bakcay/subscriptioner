@@ -10,6 +10,7 @@
 namespace App\Service;
 
 use Cache;
+use Http;
 
 class ZotloService
 {
@@ -22,7 +23,7 @@ class ZotloService
         }
 
         return Cache::remember('subscription_detail_'.$subscriptionId, 60, function () use ($subscriptionId) {
-            $resp =  \Http::withHeaders([
+            $resp =  Http::withHeaders([
                 'Content-Type'  => 'application/json',
                 'AccessKey'     => config('zotlo.access_key'),
                 'AccessSecret'  => config('zotlo.access_secret'),
@@ -40,7 +41,7 @@ class ZotloService
 
     public static function updateEmail($subscriptionId,$email)
     {
-        return \Http::withHeaders([
+        return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
             'AccessSecret'  => config('zotlo.access_secret'),
@@ -53,7 +54,7 @@ class ZotloService
 
     public static function updateUserCount($subscriptionId, $userCount)
     {
-        return \Http::withHeaders([
+        return Http::withHeaders([
             'Content-Type' => 'application/json',
             'AccessKey' => config('zotlo.access_key'),
             'AccessSecret' => config('zotlo.access_secret'),
@@ -70,7 +71,8 @@ class ZotloService
 
     public static function reactivateSubscription($subscriptionId)
     {
-        return \Http::withHeaders([
+        Cache::forget('subscription_detail_'.$subscriptionId);
+        return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
             'AccessSecret'  => config('zotlo.access_secret'),
@@ -87,7 +89,8 @@ class ZotloService
 
     public static function cancelSubscription($subscriptionId,$reason = '')
     {
-        return \Http::withHeaders([
+        Cache::forget('subscription_detail_'.$subscriptionId);
+        return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
             'AccessSecret'  => config('zotlo.access_secret'),
@@ -105,7 +108,7 @@ class ZotloService
 
     public static function makePayment(array $data)
     {
-        return \Http::withHeaders([
+        return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
             'AccessSecret'  => config('zotlo.access_secret'),
@@ -118,7 +121,7 @@ class ZotloService
 
     public static function getCardList($subscriptionId)
     {
-        return \Http::withHeaders([
+        return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
             'AccessSecret'  => config('zotlo.access_secret'),

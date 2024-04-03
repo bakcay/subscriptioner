@@ -30,7 +30,7 @@ class ReactivateService implements ShouldQueue
      */
     public function handle(): void
     {
-        $user = User::find($this->user_id);
+        $user = User::with('subscription')->find($this->user_id);
 
         $service = ZotloService::reactivateSubscription($user->subscriber_id);
 
@@ -38,7 +38,7 @@ class ReactivateService implements ShouldQueue
             throw new SubscriptionException($service['meta']['errorMessage'], 400);
         }
 
-        $user->activeSubscription->status = 'inactive';
-        $user->activeSubscription->save();
+        $user->subscription->status = 'active';
+        $user->subscription->save();
     }
 }
