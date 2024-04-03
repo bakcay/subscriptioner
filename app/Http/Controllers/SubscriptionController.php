@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\SubscriptionException;
 use App\Http\Requests\CreateSubscriptionRequest;
 use App\Models\Event;
 use App\Models\Subscription;
@@ -9,14 +10,57 @@ use App\Models\User;
 use App\Service\ZotloService;
 use Illuminate\Http\Request;
 
-class SubscriptionController extends Controller {
+class SubscriptionController extends Controller
+{
 
+
+    public function getSubscription()
+    {
+        $user_id      = auth()->user()->id;
+        $current_user = User::withCount(['activeSubscription'])
+                            ->with(['activeSubscription'])
+                            ->find($user_id);
+
+
+        if ($current_user->active_subscription_count > 0) {
+            $response = ZotloService::getSubscription($current_user->subscriber_id);
+
+            if (!isset($response['meta']['httpStatus'])) {
+                throw new SubscriptionException('Communication error with service', 400);
+            }
+
+            if ($response['meta']['httpStatus'] != 200) {
+                throw new SubscriptionException($response['meta']['errorMessage'], 400);
+            }
+
+            if ($response['result']['profile']['realStatus'] != 'active') {
+                //Here trigger an event to notify cache or database
+                return response()->json([
+                    'status'                   => 'success',
+                    'have_active_subscription' => false,
+                ]);
+            } else {
+                return response()->json([
+                    'status'                   => 'success',
+                    'have_active_subscription' => true,
+                    'subscription'             => $response['result']['profile'],
+                    //'db_record'=> $current_user->activeSubscription
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status'                   => 'success',
+                'have_active_subscription' => false
+            ]);
+        }
+    }
 
     public function createSubscription(CreateSubscriptionRequest $request)
     {
         $user_id = auth()->user()->id;
 
-        $current_user = User::withCount(['activeSubscription'])->find($user_id);
+        $current_user = User::withCount(['activeSubscription'])
+                            ->find($user_id);
 
         if ($current_user->active_subscription_count > 0) {
             throw new SubscriptionException('You already have an active subscription', 400);
@@ -26,44 +70,41 @@ class SubscriptionController extends Controller {
 
         $response_payment = ZotloService::makePayment($data_payment);
 
-        if(!isset($response_payment['meta']['httpStatus'])){
+        if (!isset($response_payment['meta']['httpStatus'])) {
             throw new SubscriptionException('Communication error with service', 400);
         }
 
         Event::create([
             'user_id'    => $user_id,
-            'event'      => $response_payment['meta']['httpStatus']==200?'started':'failed',
+            'event'      => $response_payment['meta']['httpStatus'] == 200 ? 'started' : 'failed',
             'ip'         => $request->ip(),
             'package_id' => $data_payment['packageId'],
         ]);
 
-        if($response_payment['meta']['httpStatus']=='200'){
-
+        if ($response_payment['meta']['httpStatus'] == '200') {
             $_profile = $response_payment['result']['profile'];
 
             Subscription::create([
-                'user_id'         => $user_id,
-                'status'          => 'active',
-                'start_date'      => $_profile['startDate'],
-                'end_date'        => $_profile['renewalDate'],
+                'user_id'    => $user_id,
+                'status'     => 'active',
+                'start_date' => $_profile['startDate'],
+                'end_date'   => $_profile['renewalDate'],
             ]);
 
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Subscription created successfully',
-                'payment' => [
+                'status'       => 'success',
+                'message'      => 'Subscription created successfully',
+                'payment'      => [
                     'startDate'   => $_profile['startDate'],
                     'renewalDate' => $_profile['renewalDate']
                 ],
                 'subscriberId' => $current_user->subscriber_id
             ]);
-
-        }else{
-
+        } else {
             throw new SubscriptionException($response_payment['meta']['errorMessage'], 400);
         }
-
     }
+
 
     protected function preparePaymentData($current_user, $request)
     {
@@ -97,8 +138,8 @@ class SubscriptionController extends Controller {
 
     protected function splitName($fullName)
     {
-        $parts = explode(' ', trim($fullName));
-        $lastname = array_pop($parts);
+        $parts     = explode(' ', trim($fullName));
+        $lastname  = array_pop($parts);
         $firstname = implode(' ', $parts);
         return [$firstname, $lastname];
     }

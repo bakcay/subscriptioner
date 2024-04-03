@@ -25,5 +25,6 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::get('me', [AuthController::class, 'me']);
 
+    Route::get('subscription', [SubscriptionController::class, 'getSubscription']);
     Route::post('subscription', [SubscriptionController::class, 'createSubscription']);
 });
