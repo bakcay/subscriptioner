@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HookController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'guest'], function ($router) {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+
+    Route::post('hook', [HookController::class, 'handleSubscriberUpdate']);
 });
 Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -29,7 +32,7 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('subscription', [SubscriptionController::class, 'createSubscription']);
     Route::delete('subscription', [SubscriptionController::class, 'cancelSubscription']);
     Route::put('subscription', [SubscriptionController::class, 'reactivateSubscription']);
-    Route::patch('subscription', [SubscriptionController::class, 'rescaleSubscription']);
+    Route::put('subscription/rescale', [SubscriptionController::class, 'rescaleSubscription']);
 
     Route::get('cards', [SubscriptionController::class, 'getCardList']);
 });
