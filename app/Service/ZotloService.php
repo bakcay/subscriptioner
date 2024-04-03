@@ -9,13 +9,11 @@
 
 namespace App\Service;
 
-class ZotloService {
+class ZotloService
+{
 
-    public static function makePayment(array $data) {
-
-
-
-
+    public static function makePayment(array $data)
+    {
         return \Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),

@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ZotloServiceProvider extends ServiceProvider {
+class ZotloServiceProvider extends ServiceProvider
+{
     /**
      * Register services.
      */
     public function register(): void {
-        $this->app->singleton(ZotloService::class, function ($app) {
+        $this->app->singleton(ZotloService::class, function ($app)
+        {
             return new ZotloService();
         });
     }
@@ -17,7 +19,8 @@ class ZotloServiceProvider extends ServiceProvider {
     /**
      * Bootstrap services.
      */
-    public function boot(): void {
+    public function boot(): void
+    {
         //
     }
 }

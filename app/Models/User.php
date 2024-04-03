@@ -12,7 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -61,7 +61,8 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSubscriberId($value)
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements JWTSubject {
+class User extends Authenticatable implements JWTSubject
+{
     use HasApiTokens;
     use HasFactory;
     use Notifiable;
@@ -99,18 +100,22 @@ class User extends Authenticatable implements JWTSubject {
         'password'          => 'hashed',
     ];
 
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 
-    public function subscriptions() {
+    public function subscriptions()
+    {
         return $this->hasMany(Subscription::class);
     }
-    public function activeSubscription() {
+    public function activeSubscription()
+    {
         return $this->hasOne(Subscription::class)->where('status', 'active');
     }
 }

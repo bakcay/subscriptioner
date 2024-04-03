@@ -27,7 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Event whereUserId($value)
  * @mixin \Eloquent
  */
-class Event extends Model {
+class Event extends Model
+{
     use HasFactory;
 
     protected $fillable = [

@@ -34,7 +34,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereLastCheck($value)
  * @mixin \Eloquent
  */
-class Subscription extends Model {
+class Subscription extends Model
+{
     use HasFactory;
 
     protected $fillable = [
@@ -45,7 +46,8 @@ class Subscription extends Model {
         'last_check',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 

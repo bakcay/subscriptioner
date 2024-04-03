@@ -19,6 +19,12 @@ return new class extends Migration
             $table->timestamp('end_date')->nullable();
             $table->timestamp('last_check')->default(now());
             $table->timestamps();
+
+
+            //indexes
+            $table->index('status');
+            $table->index('user_id');
+            $table->index(['user_id', 'status']);
         });
     }
 

@@ -24,6 +24,13 @@ class AuthRegisterRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
+            'name'=> ['nullable', 'string', 'max:255'],
+            'address'=> ['nullable', 'string', 'max:255'],
+            'city'=> ['nullable', 'string', 'max:25'],
+            'country'=> ['nullable', 'string', 'max:2'],
+            'phone'=> ['nullable', 'string', 'regex:/^\+[1-9]\d{1,14}$/'],
+            'tax_office'=> ['nullable', 'string', 'max:64'],
+            'tax_number'=> ['nullable', 'string', 'max:20'],
         ];
     }
 
@@ -42,6 +49,23 @@ class AuthRegisterRequest extends FormRequest
             'email.unique' => 'Email is already taken',
             'password.required' => 'Password is required',
             'password.min' => 'Password is too short',
+            'name.string' => 'Name must be a string',
+            'name.max' => 'Name is too long',
+            'address1.string' => 'Address1 must be a string',
+            'address1.max' => 'Address1 is too long',
+            'city.string' => 'City must be a string',
+            'city.max' => 'City is too long',
+            'region.string' => 'Region must be a string',
+            'region.max' => 'Region is too long',
+            'country.string' => 'Country must be a string',
+            'country.max' => 'Country is too long',
+            'phone.string' => 'Phone must be a string',
+            'phone.max' => 'Phone is too long',
+            'tax_office.string' => 'Tax office must be a string',
+            'tax_office.max' => 'Tax office is too long',
+            'tax_number.string' => 'Tax number must be a string',
+            'tax_number.max' => 'Tax number is too long',
+
         ];
     }
 
