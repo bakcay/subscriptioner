@@ -12,7 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $name
@@ -59,6 +59,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereTaxOffice($value)
  * @property string|null $subscriber_id
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSubscriberId($value)
+ * @property-read \App\Models\Subscription|null $subscription
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements JWTSubject
@@ -117,5 +118,10 @@ class User extends Authenticatable implements JWTSubject
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)->where('status', 'active');
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
     }
 }

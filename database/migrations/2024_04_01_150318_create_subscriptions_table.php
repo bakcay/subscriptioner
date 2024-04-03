@@ -15,16 +15,22 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['active', 'inactive'])->default('inactive');
+            $table->integer('user_count')->nullable();
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
-            $table->timestamp('last_check')->default(now());
-            $table->timestamps();
+            $table->timestamp('last_check')->useCurrent();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            //$table->timestamps();
 
 
             //indexes
             $table->index('status');
             $table->index('user_id');
             $table->index(['user_id', 'status']);
+
+            //unique id and status
+            $table->unique(['user_id', 'status']);
         });
     }
 

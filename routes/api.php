@@ -27,4 +27,9 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
 
     Route::get('subscription', [SubscriptionController::class, 'getSubscription']);
     Route::post('subscription', [SubscriptionController::class, 'createSubscription']);
+    Route::delete('subscription', [SubscriptionController::class, 'cancelSubscription']);
+    Route::put('subscription', [SubscriptionController::class, 'reactivateSubscription']);
+    Route::patch('subscription', [SubscriptionController::class, 'rescaleSubscription']);
+
+    Route::get('cards', [SubscriptionController::class, 'getCardList']);
 });

@@ -47,7 +47,7 @@ class AuthController extends Controller
                 'credit_card'  => $request->input('credit_card'),
                 'expire_month' => $request->input('expire_month'),
                 'expire_year'  => $request->input('expire_year'),
-                'cvv'          => $request->input('cvv')
+                'cvv'          => $request->input('cvv'),
             ]);
 
             return $subscription->createSubscription($_request_create_subscription);

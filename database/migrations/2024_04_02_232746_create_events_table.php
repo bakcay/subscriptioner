@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->enum('event',['started','cancelled','renewed','failed']);
+            $table->enum('event',['started','cancelled','reactivated','renewed','failed','extended','shrinked']);
             $table->string('ip')->nullable();
-            $table->string('package_id');
+            //$table->string('package_id')->nullable();
             $table->timestamps();
+
+            //indexes
+            $table->index('user_id');
         });
     }
 
