@@ -4,13 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateSubscriptionRequest extends FormRequest
-{
+class CreateSubscriptionRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         return true;
     }
 
@@ -19,13 +17,13 @@ class CreateSubscriptionRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
-            'credit_card'  => 'required|string|min:16|max:20',
-            'expire_month' => 'required|string|min:2|max:2',
-            'expire_year'  => 'required|string|min:4|max:4',
-            'cvv'          => 'required|string|min:3|max:4',
+            'credit_card'  => 'required|numeric|digits_between:16,20',
+            'expire_month' => 'required|numeric|digits:2',
+            'expire_year'  => 'required|numeric|digits:2',
+            'cvv'          => 'required|numeric|digits_between:3,4',
+            'card_owner'   => 'nullable|string|min:3|max:255',
         ];
     }
 }
