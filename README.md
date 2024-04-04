@@ -72,8 +72,10 @@ sail artisan migrate:fresh --seed
 TL:DR;
 
 ```bash
-git clone git@github.com:bakcay/subscriptioner.gitcd subscriptioner
+git clone git@github.com:bakcay/subscriptioner.git
+cd subscriptioner
 cp .env.example .env
+# Tam burada ZODLO Bilgilerini mutlaka .env dosyasına ekleyin
 docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
@@ -90,6 +92,37 @@ sail artisan migrate:fresh --seed
 Artık proje hazır. ve erişilebilir.
 
 ## Kullanım
+
+### Command ile kullanım (CLI-Artisan)
+
+Var olan kullanıcıya kredi kartı ile abonelik açtırtma (örnek kullanıcı id: 2)
+```bash
+sail artisan subscription:create 2 4000000000000001 12/23 111
+```
+
+Aboneliği iptal etme (örnek kullanıcı id: 2)
+```bash
+sail artisan subscription:cancel 2
+```
+
+İptal olan Aboneliği aktifleştirme (örnek kullanıcı id: 2)
+```bash
+sail artisan subscription:reactive 2
+```
+
+Kullanıcının abonelik bilgilerini tablo olarak görme (örnek kullanıcı id: 2)
+```bash
+sail artisan subscription:get 2
+```
+
+Kullanıcının aboneliğine ilişik kayıtlı kart bilgilerini tablo olarak görme (örnek kullanıcı id: 2)
+```bash
+sail artisan subscription:cards 2
+```
+
+
+### Postman ile kullanım
+
 [Buradaki](postman_collection.json) postman collection dosyasını import ederek kullanabilirsiniz. 
 
 ### Postman açıklamaları:
@@ -131,4 +164,6 @@ Bu endpoint, yerel (local) geliştirme ortamı olduğu için IP sınırlaması o
 - Performans için mümkün olan yerlerde cache kullanılmıştır. Event bazlı invalidasyonlar yapılmıştır.
 - Tabloların performassı için sorgulamalarda geçen kriterlerde index kullanılmıştır.
 - Webhooklar için bir endpoint oluşturulmuştur. Bu endpoint yerelde çalıştığı için IP sınırlaması yoktur.
-
+- Cronların aslında bir dakika olması çok da ideal değil farkındayım fakat workerin çalıştığını görülmesi için bir dakika olarak ayarlandı.
+- Jobların asenkron çalışması için queue kullanılmıştır. Logları ise storage/logs içerisinde bulunmaktadır.
+- Servis içinde de exception fırlatabilirdim fakat commandlarda fırlatılan exceptionlar http status code döndürmediği için bu şekilde bir yol izledim. Evet bir kaç kod tekrarı var fakat bu şekilde daha anlaşılır olacağını düşündüm.
