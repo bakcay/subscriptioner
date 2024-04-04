@@ -82,7 +82,13 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     public function me() {
-        return response()->json(auth()->user());
+
+        $user_id  = auth()->user()->id;
+
+        return \Cache::remember("user_{$user_id}", 512, function () use ($user_id) {
+            return User::find($user_id);
+        });
+
     }
 
     /**

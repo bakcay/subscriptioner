@@ -108,6 +108,7 @@ class ZotloService
 
     public static function makePayment(array $data)
     {
+        Cache::forget('card_list_'.$data['subscriberId']);
         return Http::withHeaders([
             'Content-Type'  => 'application/json',
             'AccessKey'     => config('zotlo.access_key'),
@@ -121,15 +122,18 @@ class ZotloService
 
     public static function getCardList($subscriptionId)
     {
-        return Http::withHeaders([
-            'Content-Type'  => 'application/json',
-            'AccessKey'     => config('zotlo.access_key'),
-            'AccessSecret'  => config('zotlo.access_secret'),
-            'ApplicationId' => config('zotlo.application_id'),
-            'Language'      => config('zotlo.language'),
-        ])
+        return Cache::remember('card_list_'.$subscriptionId, 60, function () use ($subscriptionId) {
+             return Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'AccessKey'     => config('zotlo.access_key'),
+                'AccessSecret'  => config('zotlo.access_secret'),
+                'ApplicationId' => config('zotlo.application_id'),
+                'Language'      => config('zotlo.language'),
+            ])
           ->get(config('zotlo.base_url') . '/v1/subscription/card-list' ,['subscriberId'=>$subscriptionId])
           ->json();
+        });
+
     }
 
 }

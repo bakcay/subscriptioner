@@ -98,7 +98,7 @@ class SubscriptionController extends Controller
                     'expireDate' => $_profile['expireDate']
                 ],
                 'subscriberId' => $current_user->subscriber_id,
-                'token'        => \Auth::tokenById($user_id)
+                'access_token'        => \Auth::tokenById($user_id)
             ]);
         } else {
             Event::create([

@@ -16,11 +16,13 @@ return new class extends Migration
             $table->integer('user_id');
             $table->enum('event',['started','cancelled','reactivated','renewed','failed','extended','shrinked']);
             $table->string('ip')->nullable();
-            //$table->string('package_id')->nullable();
             $table->timestamps();
 
             //indexes
             $table->index('user_id');
+            $table->index('event');
+            $table->index(['created_at']);
+            $table->index(['created_at','event']);
         });
     }
 

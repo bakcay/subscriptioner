@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HookController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,6 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'guest'], function ($router) {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-
     Route::post('hook', [HookController::class, 'handleSubscriberUpdate']);
 });
 Route::group(['middleware' => 'auth:api'], function ($router) {
@@ -36,3 +36,9 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
 
     Route::get('cards', [SubscriptionController::class, 'getCardList']);
 });
+
+Route::group(['middleware' => 'superadmin'], function ($router) {
+    Route::get('report/{date}', [ReportController::class, 'report']);
+    Route::get('report/{start_date}/{end_date}', [ReportController::class, 'dateRangeReport']);
+});
+

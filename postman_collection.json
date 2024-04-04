@@ -1,685 +1,685 @@
 {
-	"info": {
-		"_postman_id": "36772149-9d66-4f31-9ab0-41d55ad8ad51",
-		"name": "Subscriptioner",
-		"description": "### Login\n\nBu endpoint, normal kullanıcıların sisteme giriş yapmalarını sağlar. Başarıyla giriş yapıldığında, otomatik olarak oluşturulan bir token döndürülür. Bu token, token gerektiren tüm endpointlerde kullanılmak üzere paylaşılır, böylece kullanıcıların kopyala yapıştır yapmasına gerek kalmaz.\n\n### Admin Login\n\nRaporlama işlemleri için tasarlanmıştır. Abonelik durumları gibi kritik verilerin raporlanması, sadece admin yetkisine sahip kullanıcılar tarafından yapılabilir. Uygulamanın kurulumu (seed) esnasında otomatik olarak bir adet admin kullanıcısı oluşturulur.\n\n### Register\n\nBu endpoint, yeni kullanıcı hesapları oluşturmak için kullanılır. Kullanıcı kaydı için minimum olarak email ve şifre bilgileri gereklidir. İsteğe bağlı olarak ad, adres, şehir, bölge, ülke, telefon, vergi dairesi ve vergi numarası gibi ek bilgiler de girilebilir. Girilmeyen bilgiler, faker kütüphanesi tarafından otomatik olarak doldurulur. Email adresi benzersiz (unique) olmalıdır. Kullanıcı başarıyla oluşturulduktan sonra, token Postman'de login endpointiyle benzer şekilde global bir değişken olarak ayarlanır.\n\n### Subscribe\n\nBu endpoint, tokeni girilen kullanıcının, henüz bir aboneliği yoksa, girilen kart bilgileriyle yeni bir abonelik oluşturmasını sağlar.\n\n### Register&Subscribe\n\nBu endpoint, Register ve Subscribe işlemlerini tek bir adımda gerçekleştiren birleşik bir işlev sunar. İşlem sonucunda dönen token, Postman'de diğer endpointlerde kullanılmak üzere global bir değişken olarak ayarlanabilir.\n\n### Cancel\n\nTokeni verilen kullanıcının mevcut aboneliğini pasifleştirir. Bu işlem, asenkron olarak bir kuyruğa eklenerek gerçekleştirilir. Real-time işlemi desteklemek için alternatif olarak kuyruğa eklenmeden de yapılabilecek bir işlem olsa da, bu seçenek yorum satırı olarak bırakılmıştır.\n\n### Reactive\n\nTokeni verilen kullanıcının pasifleştirilmiş olan aboneliğini yeniden aktifleştirir.\n\n### My Subscription\n\nBu endpoint, tokeni verilen kullanıcının, hem sistemdeki hem de uzaktan API üzerindeki abonelik bilgilerini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.\n\n### My Card List\n\nTokeni verilen kullanıcının, uzaktan API üzerinde kayıtlı olan kartlarının listesini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.\n\n### My Details\n\nBu endpoint, veritabanındaki kullanıcı bilgilerini döndürür. Performansı kısmen artırmak için, response zamanında cache'lenir.\n\n### Report Single Day\n\nAdmin tokeni ile çalışan bu endpoint, seçilen tek bir gün için abonelik olaylarının özetini içerir.\n\n### Report Day Range\n\nAdmin tokeni ile çalışan bu endpoint, en fazla 10 gün arasındaki abonelik olaylarının gruplanmış özetini sunar.\n\n### Secure Hook\n\nBu endpoint, yerel (local) geliştirme ortamı olduğu için IP sınırlaması olmadan çalışır. API servisinden gelen hookların işlenerek abonelik durumlarının güncellenmesi gibi işlemlere dönüşmesini sağlar; örneğin, aboneliğin pasifleştirilmesi veya aktifleştirilmesi gibi.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "11236728"
-	},
-	"item": [
-		{
-			"name": "Login",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\":\"test@example.com\",\n    \"password\":\"password\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/login",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Admin Login",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\":\"superadmin@example.com\",\n    \"password\":\"password\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/login",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Register",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\":\"test003@bunyam.in\",\n    \"password\":\"password\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/register",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Subscribe",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/subscription",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"subscription"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Register & Subscribe",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\":\"test356@example.com\",\n    \"password\":\"password\",\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/register",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Cancel",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\":\"test1@example.com\",\n    \"password\":\"password\",\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/subscription",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"subscription"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Reactivate",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/subscription",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"subscription"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Rescale",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"count\":4\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/subscription/rescale",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"subscription",
-						"rescale"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "My Subscription",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/subscription",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"subscription"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "My Card List",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/cards",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"cards"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "My details",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "email",
-							"value": "test@example.com",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/me",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"me"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMC4wLjAuMC9hcGkvbG9naW4iLCJpYXQiOjE3MTIwMTA5MDYsImV4cCI6MTcxMjAxNDUwNiwibmJmIjoxNzEyMDEwOTA2LCJqdGkiOiJlbWYwS3ZHVGhKVjdoSDNlIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JpESjtgaTo_hojG0dproMIqyt3xIzk0K5-KBMSzcfHY",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Report Single Day (ADMIN)",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "email",
-							"value": "test@example.com",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/report/2024-04-04",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"report",
-						"2024-04-04"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Report Day Range (ADMIN)",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{TOKEN}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "email",
-							"value": "test@example.com",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/report/2024-04-01/2024-04-09",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"report",
-						"2024-04-01",
-						"2024-04-09"
-					],
-					"query": [
-						{
-							"key": "token",
-							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMC4wLjAuMC9hcGkvbG9naW4iLCJpYXQiOjE3MTIwMTA5MDYsImV4cCI6MTcxMjAxNDUwNiwibmJmIjoxNzEyMDEwOTA2LCJqdGkiOiJlbWYwS3ZHVGhKVjdoSDNlIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JpESjtgaTo_hojG0dproMIqyt3xIzk0K5-KBMSzcfHY",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Secure Hook",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"queue\": {\n    \"type\": \"SubscriberUpdate\",\n    \"eventType\": \"newSubscriber\",\n    \"requestID\": \"1721a221-f646-4d41-955b-91a35d630920\",\n    \"createDate\": {\n      \"date\": \"2023-11-14 01:22:11.888000\",\n      \"timezone_type\": 3,\n      \"timezone\": \"UTC\"\n    },\n    \"appId\": 1\n  },\n  \"parameters\": {\n    \"profile\": {\n      \"status\": \"active\",\n      \"realStatus\": \"active\",\n      \"subscriberId\": \"52c48f98-3c5a-4254-a6be-3771ed64b7ef\",\n      \"subscriptionId\": 1000,\n      \"subscriptionType\": \"paid\",\n      \"startDate\": \"2023-08-24 01:21:46\",\n      \"expireDate\": \"2023-11-30 01:21:46\",\n      \"renewalDate\": \"2023-11-30 01:21:46\",\n      \"package\": \"premium.package\",\n      \"country\": \"TR\",\n      \"phoneNumber\": \"+905555555555\",\n      \"language\": \"tr\",\n      \"originalTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\n      \"lastTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\n      \"subscriptionPackageType\": \"single\",\n      \"cancellation\": null,\n      \"customParameters\": {\n      },\n      \"quantity\": 2,\n      \"pendingQuantity\": 0,\n      \"renewalFetchCount\": 0\n    },\n    \"package\": {\n      \"packageId\": \"premium.package\",\n      \"price\": 99,\n      \"currency\": \"TRY\",\n      \"packageType\": \"subscription\",\n      \"name\": \"Premium Package\",\n      \"subscriptionPackageType\": \"single\",\n      \"bundlePackages\": [\n      ]\n    },\n    \"newPackage\": null,\n    \"card\": {\n      \"cardNumber\": \"411111****1111\",\n      \"expireDate\": \"06/30\"\n    },\n    \"customer\": null\n  }\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{DOMAIN}}/api/hook",
-					"host": [
-						"{{DOMAIN}}"
-					],
-					"path": [
-						"api",
-						"hook"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "DOMAIN",
-			"value": "0.0.0.0",
-			"type": "string"
-		},
-		{
-			"key": "TOKEN",
-			"value": "x",
-			"type": "string"
-		}
-	]
+    "info": {
+        "_postman_id": "36772149-9d66-4f31-9ab0-41d55ad8ad51",
+        "name": "Subscriptioner",
+        "description": "### Login\n\nBu endpoint, normal kullanıcıların sisteme giriş yapmalarını sağlar. Başarıyla giriş yapıldığında, otomatik olarak oluşturulan bir token döndürülür. Bu token, token gerektiren tüm endpointlerde kullanılmak üzere paylaşılır, böylece kullanıcıların kopyala yapıştır yapmasına gerek kalmaz.\n\n### Admin Login\n\nRaporlama işlemleri için tasarlanmıştır. Abonelik durumları gibi kritik verilerin raporlanması, sadece admin yetkisine sahip kullanıcılar tarafından yapılabilir. Uygulamanın kurulumu (seed) esnasında otomatik olarak bir adet admin kullanıcısı oluşturulur.\n\n### Register\n\nBu endpoint, yeni kullanıcı hesapları oluşturmak için kullanılır. Kullanıcı kaydı için minimum olarak email ve şifre bilgileri gereklidir. İsteğe bağlı olarak ad, adres, şehir, bölge, ülke, telefon, vergi dairesi ve vergi numarası gibi ek bilgiler de girilebilir. Girilmeyen bilgiler, faker kütüphanesi tarafından otomatik olarak doldurulur. Email adresi benzersiz (unique) olmalıdır. Kullanıcı başarıyla oluşturulduktan sonra, token Postman'de login endpointiyle benzer şekilde global bir değişken olarak ayarlanır.\n\n### Subscribe\n\nBu endpoint, tokeni girilen kullanıcının, henüz bir aboneliği yoksa, girilen kart bilgileriyle yeni bir abonelik oluşturmasını sağlar.\n\n### Register&Subscribe\n\nBu endpoint, Register ve Subscribe işlemlerini tek bir adımda gerçekleştiren birleşik bir işlev sunar. İşlem sonucunda dönen token, Postman'de diğer endpointlerde kullanılmak üzere global bir değişken olarak ayarlanabilir.\n\n### Cancel\n\nTokeni verilen kullanıcının mevcut aboneliğini pasifleştirir. Bu işlem, asenkron olarak bir kuyruğa eklenerek gerçekleştirilir. Real-time işlemi desteklemek için alternatif olarak kuyruğa eklenmeden de yapılabilecek bir işlem olsa da, bu seçenek yorum satırı olarak bırakılmıştır.\n\n### Reactive\n\nTokeni verilen kullanıcının pasifleştirilmiş olan aboneliğini yeniden aktifleştirir.\n\n### My Subscription\n\nBu endpoint, tokeni verilen kullanıcının, hem sistemdeki hem de uzaktan API üzerindeki abonelik bilgilerini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.\n\n### My Card List\n\nTokeni verilen kullanıcının, uzaktan API üzerinde kayıtlı olan kartlarının listesini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.\n\n### My Details\n\nBu endpoint, veritabanındaki kullanıcı bilgilerini döndürür. Performansı kısmen artırmak için, response zamanında cache'lenir.\n\n### Report Single Day\n\nAdmin tokeni ile çalışan bu endpoint, seçilen tek bir gün için abonelik olaylarının özetini içerir.\n\n### Report Day Range\n\nAdmin tokeni ile çalışan bu endpoint, en fazla 10 gün arasındaki abonelik olaylarının gruplanmış özetini sunar.\n\n### Secure Hook\n\nBu endpoint, yerel (local) geliştirme ortamı olduğu için IP sınırlaması olmadan çalışır. API servisinden gelen hookların işlenerek abonelik durumlarının güncellenmesi gibi işlemlere dönüşmesini sağlar; örneğin, aboneliğin pasifleştirilmesi veya aktifleştirilmesi gibi.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "11236728"
+    },
+    "item": [
+        {
+            "name": "Login",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\":\"test@example.com\",\n    \"password\":\"password\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/login",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "login"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Admin Login",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\":\"superadmin@example.com\",\n    \"password\":\"password\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/login",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "login"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Register",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\":\"test003@bunyam.in\",\n    \"password\":\"password\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/register",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "register"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Subscribe",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/subscription",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "subscription"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Register & Subscribe",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "pm.collectionVariables.set(\"TOKEN\", jsonData.access_token);"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\":\"test356@example.com\",\n    \"password\":\"password\",\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/register",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "register"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Cancel",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\":\"test1@example.com\",\n    \"password\":\"password\",\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/subscription",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "subscription"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Reactivate",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/subscription",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "subscription"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Rescale",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"count\":4\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/subscription/rescale",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "subscription",
+                        "rescale"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "My Subscription",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/subscription",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "subscription"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "My Card List",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"credit_card\":\"4111111111111111\",\n    \"expire_year\":\"23\",\n    \"expire_month\":\"12\",\n    \"cvv\":\"111\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/cards",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "cards"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "My details",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "email",
+                            "value": "test@example.com",
+                            "type": "text"
+                        },
+                        {
+                            "key": "password",
+                            "value": "password",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/me",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "me"
+                    ],
+                    "query": [
+                        {
+                            "key": "token",
+                            "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMC4wLjAuMC9hcGkvbG9naW4iLCJpYXQiOjE3MTIwMTA5MDYsImV4cCI6MTcxMjAxNDUwNiwibmJmIjoxNzEyMDEwOTA2LCJqdGkiOiJlbWYwS3ZHVGhKVjdoSDNlIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JpESjtgaTo_hojG0dproMIqyt3xIzk0K5-KBMSzcfHY",
+                            "disabled": true
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Report Single Day (ADMIN)",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "email",
+                            "value": "test@example.com",
+                            "type": "text"
+                        },
+                        {
+                            "key": "password",
+                            "value": "password",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/report/2024-04-04",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "report",
+                        "2024-04-04"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Report Day Range (ADMIN)",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{TOKEN}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "email",
+                            "value": "test@example.com",
+                            "type": "text"
+                        },
+                        {
+                            "key": "password",
+                            "value": "password",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/report/2024-04-01/2024-04-09",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "report",
+                        "2024-04-01",
+                        "2024-04-09"
+                    ],
+                    "query": [
+                        {
+                            "key": "token",
+                            "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMC4wLjAuMC9hcGkvbG9naW4iLCJpYXQiOjE3MTIwMTA5MDYsImV4cCI6MTcxMjAxNDUwNiwibmJmIjoxNzEyMDEwOTA2LCJqdGkiOiJlbWYwS3ZHVGhKVjdoSDNlIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JpESjtgaTo_hojG0dproMIqyt3xIzk0K5-KBMSzcfHY",
+                            "disabled": true
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Secure Hook",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"queue\": {\n    \"type\": \"SubscriberUpdate\",\n    \"eventType\": \"newSubscriber\",\n    \"requestID\": \"1721a221-f646-4d41-955b-91a35d630920\",\n    \"createDate\": {\n      \"date\": \"2023-11-14 01:22:11.888000\",\n      \"timezone_type\": 3,\n      \"timezone\": \"UTC\"\n    },\n    \"appId\": 1\n  },\n  \"parameters\": {\n    \"profile\": {\n      \"status\": \"active\",\n      \"realStatus\": \"active\",\n      \"subscriberId\": \"52c48f98-3c5a-4254-a6be-3771ed64b7ef\",\n      \"subscriptionId\": 1000,\n      \"subscriptionType\": \"paid\",\n      \"startDate\": \"2023-08-24 01:21:46\",\n      \"expireDate\": \"2023-11-30 01:21:46\",\n      \"renewalDate\": \"2023-11-30 01:21:46\",\n      \"package\": \"premium.package\",\n      \"country\": \"TR\",\n      \"phoneNumber\": \"+905555555555\",\n      \"language\": \"tr\",\n      \"originalTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\n      \"lastTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\n      \"subscriptionPackageType\": \"single\",\n      \"cancellation\": null,\n      \"customParameters\": {\n      },\n      \"quantity\": 2,\n      \"pendingQuantity\": 0,\n      \"renewalFetchCount\": 0\n    },\n    \"package\": {\n      \"packageId\": \"premium.package\",\n      \"price\": 99,\n      \"currency\": \"TRY\",\n      \"packageType\": \"subscription\",\n      \"name\": \"Premium Package\",\n      \"subscriptionPackageType\": \"single\",\n      \"bundlePackages\": [\n      ]\n    },\n    \"newPackage\": null,\n    \"card\": {\n      \"cardNumber\": \"411111****1111\",\n      \"expireDate\": \"06/30\"\n    },\n    \"customer\": null\n  }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{DOMAIN}}/api/hook",
+                    "host": [
+                        "{{DOMAIN}}"
+                    ],
+                    "path": [
+                        "api",
+                        "hook"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "DOMAIN",
+            "value": "0.0.0.0",
+            "type": "string"
+        },
+        {
+            "key": "TOKEN",
+            "value": "x",
+            "type": "string"
+        }
+    ]
 }

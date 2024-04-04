@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('tax_office',64)->nullable();
             $table->string('tax_number',20)->nullable();
             $table->string('subscriber_id')->nullable();
+            $table->boolean('superadmin')->default(false);
             $table->rememberToken();
             $table->timestamps();
 

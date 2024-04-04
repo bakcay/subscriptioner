@@ -12,7 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -79,6 +79,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'superadmin'
     ];
 
     /**
