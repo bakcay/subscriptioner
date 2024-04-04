@@ -1,66 +1,134 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+### Subscriptioner 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Subscriptioner laravel 10 + sail ile çalışır , öncelikle lokalinizde docker, docker-compose yüklü ve ayakta olduğuna emin olun.
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Kurulum
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Öncelikle projeyi klonlayın.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+git clone git@github.com:bakcay/subscriptioner.git
+```
 
-## Learning Laravel
+Daha sonra projenin bulunduğu dizine gidin.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+cd subscriptioner
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Çalıştırmak için docker a ihtiyaç duyacaktır , docker kurulu değilse [docker](https://docs.docker.com/get-docker/) adresinden indirebilirsiniz.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+.env dosyasını oluşturmak için aşağıdaki komutu çalıştırabilirsiniz.
 
-### Premium Partners
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Oluşmuş .env dosyasındaki ZOTLO_* bilgilerini eksiksiz doldurun.
 
-## Contributing
+Gerekli dependency'leri yüklemek için aşağıdaki komutu çalıştırın.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
+```
 
-## Code of Conduct
+Sail aliası eklemek için aşağıdaki komutu çalıştırın.
+```bash
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Daha sonra aşağıdaki komutu çalıştırarak projeyi ayağa kaldırabilirsiniz.
 
-## Security Vulnerabilities
+```bash
+sail up -d
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Key generate etmeniz gerekli.
 
-## License
+```bash
+sail artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ayrıca JWT secret key de generate etmeniz gerekli.
+
+```bash
+sail artisan jwt:secret
+```
+
+Veritabanı tablolarını da oluşturmak için aşağıdaki komutu çalıştırabilirsiniz.
+
+```bash
+sail artisan migrate:fresh --seed
+```
+
+TL:DR;
+
+```bash
+git clone git@github.com:bakcay/subscriptioner.gitcd subscriptioner
+cp .env.example .env
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+sail up -d
+sail artisan key:generate
+sail artisan jwt:secret
+sail artisan migrate:fresh --seed
+```
+
+Artık proje hazır. ve erişilebilir.
+
+## Kullanım
+[Buradaki](postman_collection.json) postman collection dosyasını import ederek kullanabilirsiniz. 
+
+### Postman açıklamaları:
+
+### Login
+Bu endpoint, normal kullanıcıların sisteme giriş yapmalarını sağlar. Başarıyla giriş yapıldığında, otomatik olarak oluşturulan bir token döndürülür. Bu token, token gerektiren tüm endpointlerde kullanılmak üzere paylaşılır, böylece kullanıcıların kopyala yapıştır yapmasına gerek kalmaz.
+### Admin Login
+Raporlama işlemleri için tasarlanmıştır. Abonelik durumları gibi kritik verilerin raporlanması, sadece admin yetkisine sahip kullanıcılar tarafından yapılabilir. Uygulamanın kurulumu (seed) esnasında otomatik olarak bir adet admin kullanıcısı oluşturulur.
+### Register
+Bu endpoint, yeni kullanıcı hesapları oluşturmak için kullanılır. Kullanıcı kaydı için minimum olarak email ve şifre bilgileri gereklidir. İsteğe bağlı olarak ad, adres, şehir, bölge, ülke, telefon, vergi dairesi ve vergi numarası gibi ek bilgiler de girilebilir. Girilmeyen bilgiler, faker kütüphanesi tarafından otomatik olarak doldurulur. Email adresi benzersiz (unique) olmalıdır. Kullanıcı başarıyla oluşturulduktan sonra, token Postman'de login endpointiyle benzer şekilde global bir değişken olarak ayarlanır.
+### Subscribe
+Bu endpoint, tokeni girilen kullanıcının, henüz bir aboneliği yoksa, girilen kart bilgileriyle yeni bir abonelik oluşturmasını sağlar.
+### Register&Subscribe
+Bu endpoint, Register ve Subscribe işlemlerini tek bir adımda gerçekleştiren birleşik bir işlev sunar. İşlem sonucunda dönen token, Postman'de diğer endpointlerde kullanılmak üzere global bir değişken olarak ayarlanabilir.
+### Cancel
+Tokeni verilen kullanıcının mevcut aboneliğini pasifleştirir. Bu işlem, asenkron olarak bir kuyruğa eklenerek gerçekleştirilir. Real-time işlemi desteklemek için alternatif olarak kuyruğa eklenmeden de yapılabilecek bir işlem olsa da, bu seçenek yorum satırı olarak bırakılmıştır.
+### Reactive
+Tokeni verilen kullanıcının pasifleştirilmiş olan aboneliğini yeniden aktifleştirir.
+### My Subscription
+Bu endpoint, tokeni verilen kullanıcının, hem sistemdeki hem de uzaktan API üzerindeki abonelik bilgilerini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.
+### My Card List
+Tokeni verilen kullanıcının, uzaktan API üzerinde kayıtlı olan kartlarının listesini çeker. Performansı artırmak için, event temelli flush edilen bir cache mekanizması ile desteklenir.
+### My Details
+Bu endpoint, veritabanındaki kullanıcı bilgilerini döndürür. Performansı kısmen artırmak için, response zamanında cache'lenir.
+### Report Single Day
+Admin tokeni ile çalışan bu endpoint, seçilen tek bir gün için abonelik olaylarının özetini içerir.
+### Report Day Range
+Admin tokeni ile çalışan bu endpoint, en fazla 10 gün arasındaki abonelik olaylarının gruplanmış özetini sunar.
+### Secure Hook
+Bu endpoint, yerel (local) geliştirme ortamı olduğu için IP sınırlaması olmadan çalışır. API servisinden gelen hookların işlenerek abonelik durumlarının güncellenmesi gibi işlemlere dönüşmesini sağlar; örneğin, aboneliğin pasifleştirilmesi veya aktifleştirilmesi gibi.
+
+### Açıklamalar
+- Laravel 11 JWT Auth tam olarak uyumlu olmadığından 10 versiyonu kullanılmıştır.
+- Email tekilliği request ve validationlar vasıtlasyla sağlamaktadır.
+- Abonelik kullanıcılar için bir adet oluşturulabilir.
+- Aboneliklerin pasif ve aktif durumları vardır.
+- Abonelikler docker ayağa kalktığı andan itibaren dakika başı kontrol edilir. Durum , bitiş tarihi ve quantity bilgileri güncellenir.
+- Migrationlar ve seederlar ile birlikte bir admin bir adet de normal kullanıcı oluşturulur. Postman collectionunda bunlar eklidir.
+- Performans için mümkün olan yerlerde cache kullanılmıştır. Event bazlı invalidasyonlar yapılmıştır.
+- Tabloların performassı için sorgulamalarda geçen kriterlerde index kullanılmıştır.
+- Webhooklar için bir endpoint oluşturulmuştur. Bu endpoint yerelde çalıştığı için IP sınırlaması yoktur.
+
